@@ -13,8 +13,16 @@
     "modules"
   ],
   "files": [
-    "lib"
+    "lib",
+    "LICENSE"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vasilevich/sync-yarnlock-into-packagejson"
+  },
+  "bugs": {
+    "url": "https://github.com/vasilevich/sync-yarnlock-into-packagejson/issues"
+  },
   "author": "Yosef Langer",
   "license": "MIT",
   "devDependencies": {
