@@ -1,0 +1,30 @@
+{
+  "name": "sync-yarnlock-into-packagejson",
+  "version": "1.0.0",
+  "description": "Syncs yarn.lock versions into an exsisting package.json file, removing dynamic numbers such as with ^, keeping static versions intact.",
+  "main": "./lib/index.js",
+  "typings": "./lib/index.d.ts",
+  "scripts": {
+    "compile": "rimraf lib/ && tsc"
+  },
+  "keywords": [
+    "typescript",
+    "node",
+    "modules"
+  ],
+  "files": [
+    "lib"
+  ],
+  "author": "Yosef Langer",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "6.0.31",
+    "rimraf": "^2.6.2",
+    "ts-node": "^1.2.1",
+    "typescript": "^2.1.0-dev.20160724"
+  },
+  "dependencies": {
+    "commander": "^2.11.0",
+    "yarn-lock-convert": "^1.0.1"
+  }
+}
