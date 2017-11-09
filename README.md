@@ -21,7 +21,7 @@ npm install -g sync-yarnlock-into-packagejson
 ## Usage
 
 ```
-  Usage: sync-yarnlock-into-packagejson [options]
+  Usage: syncyarnlock [options]
 
   Sync `yarn.lock` package versions, into package.json
 
@@ -38,7 +38,7 @@ npm install -g sync-yarnlock-into-packagejson
   
   Examples:
   //perform inside a directory with yarn.lock and package.json, will output package.json.yarn in the same directory.
-  sync-yarnlock-into-packagejson    
+  syncyarnlock   
   
 
 ```
