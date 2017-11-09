@@ -8,7 +8,7 @@ import * as yarnconverter from 'yarn-lock-convert';
 
 
 program
-    .version('0.0.1')
+    .version(require("../package.json").version)
     .description('Sync `yarn.lock` package versions, into package.json')
     .option('-d, --dir <path>', 'directory path where the yarn.lock file is located (default to current directory)')
     .option('-p, --dirPackageJson <path>', 'directory of project with target package.json, if not set, -d will be used')
@@ -18,10 +18,10 @@ program
     .parse(process.argv);
 
 
-const proccessVersion = (version) => {
-    if (version.includes("+"))
-        return version;
-    return program.keepUpArrow ? `^${version}` : version;
+const proccessVersion = (newVersion, currentVersion) => {
+    if (program.keepGit && currentVersion.includes("+"))
+        return currentVersion;
+    return program.keepUpArrow ? `^${newVersion}` : newVersion;
 }
 
 
@@ -32,10 +32,10 @@ const yarnLockSyncIntoPackageJson = (packageJsonObject, yarnLockObject) => {
     }));
     yarnLock.forEach(dependency => {
         if (packageJsonObject.dependencies && dependency.key in packageJsonObject.dependencies) {
-            packageJsonObject.dependencies[dependency.key] = proccessVersion(dependency.version);
+            packageJsonObject.dependencies[dependency.key] = proccessVersion(dependency.version, packageJsonObject.dependencies[dependency.key]);
         }
         else if (packageJsonObject.devDependencies && dependency.key in packageJsonObject.devDependencies) {
-            packageJsonObject.devDependencies[dependency.key] = proccessVersion(dependency.version);
+            packageJsonObject.devDependencies[dependency.key] = proccessVersion(dependency.version, packageJsonObject.devDependencies[dependency.key]);
         }
     });
     return packageJsonObject;
