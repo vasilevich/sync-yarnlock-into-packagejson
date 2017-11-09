@@ -14,10 +14,13 @@ program
     .option('-p, --dirPackageJson <path>', 'directory of project with target package.json, if not set, -d will be used')
     .option('-s, --save', 'By default don\'t override the package.json file, make a new one instead package.json.yarn ')
     .option('-k, --keepUpArrow', 'By default the ^ or any other dynamic numbers are removed and replaced with static ones.')
+    .option('-g, --keepGit', 'By default direct git repositories are also replaced by the version written in yarn.')
     .parse(process.argv);
 
 
 const proccessVersion = (version) => {
+    if (version.includes("+"))
+        return version;
     return program.keepUpArrow ? `^${version}` : version;
 }
 
