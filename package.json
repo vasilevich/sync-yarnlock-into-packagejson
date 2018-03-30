@@ -1,6 +1,6 @@
 {
   "name": "sync-yarnlock-into-packagejson",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Syncs yarn.lock versions into an exsisting package.json file, removing dynamic numbers such as with ^, keeping static versions intact.",
   "main": "./lib/index.js",
   "typings": "./lib/index.d.ts",
