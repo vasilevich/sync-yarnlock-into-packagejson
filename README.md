@@ -7,7 +7,7 @@ This program uses yarn's official parser to read the `yarn.lock` file and then
 produce a promise that returns a json/object.
 
 ## Install
-#### YARN
+#### ~~YARN~~( Doesn't work because of the HYPHENS please use npm)
 ```bash
 yarn add -g sync-yarnlock-into-packagejson
 ```
