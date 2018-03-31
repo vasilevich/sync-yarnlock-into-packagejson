@@ -1,20 +1,20 @@
-[![npm version](https://badge.fury.io/js/sync-yarnlock-into-packagejson.svg)](https://www.npmjs.com/package/sync-yarnlock-into-packagejson)
+[![npm version](https://badge.fury.io/js/syncyarnlock.svg)](https://www.npmjs.com/package/syncyarnlock)
 
 
-# sync-yarnlock-into-packagejson
+# syncyarnlock
 
 This program uses yarn's official parser to read the `yarn.lock` file and then
 produce a promise that returns a json/object.
 
 ## Install
-#### ~~YARN~~( Doesn't work because of the HYPHENS please use npm)
+#### YARN
 ```bash
-yarn add -g sync-yarnlock-into-packagejson
+yarn add -g syncyarnlock
 ```
 ### or     
 #### NPM
 ```bash
-npm install -g sync-yarnlock-into-packagejson
+npm install -g syncyarnlock
 ```
 
 
@@ -33,6 +33,9 @@ npm install -g sync-yarnlock-into-packagejson
     -p, --dirPackageJson <path>  directory of project with target package.json, if not set, -d will be used
     -s, --save                   By default don't override the package.json file, make a new one instead package.json.yarn
     -k, --keepUpArrow            By default the ^ or any other dynamic numbers are removed and replaced with static ones.
+    -g, --keepGit                By default direct git repositories are also replaced by the version written in yarn.
+    -l, --keepLink               By default direct link: repositories are also replaced by the version written in yarn.
+    -a, --keepVariable <variable>By default everything is converted to yarn version, write a part of the type you wish not to convert, seperate by comma if more than one, to not replace git and link you would use +,link:
     -h, --help                   output usage information
   Transforms yarn.lock files to JSON
   
