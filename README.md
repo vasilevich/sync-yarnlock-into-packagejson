@@ -2,10 +2,7 @@
 
 
 # syncyarnlock
-
-This program uses yarn's official parser to read the `yarn.lock` file and then
-produce a promise that returns a json/object.
-
+Syncs `yarn.lock` versions into an exsisting `package.json` file, removing dynamic numbers such as with ^, keeping static versions intact.
 ## Install
 #### YARN
 ```bash
