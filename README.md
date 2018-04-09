@@ -6,7 +6,7 @@ Syncs `yarn.lock` versions into an exsisting `package.json` file, removing dynam
 ## Install
 #### YARN
 ```bash
-yarn add global syncyarnlock
+yarn global add syncyarnlock
 ```
 ### or     
 #### NPM
