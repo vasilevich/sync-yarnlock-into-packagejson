@@ -53,7 +53,7 @@ const packageDir = program.dirPackageJson ? program.dirPackageJson : dir;
 const saveTo = path.resolve(packageDir, program.save ? 'package.json' : 'package.json.yarn');
 yarnconverter.toObject().then((yarnLockObj) => {
     (fs.readFile(path.resolve(packageDir, 'package.json'), 'utf8', (err, packageJsonString) => {
-        fs.writeFile(saveTo, JSON.stringify(yarnLockSyncIntoPackageJson(JSON.parse(packageJsonString), yarnLockObj), null, 2), (e) => console.log('done', e ? e : ''));
+        fs.writeFile(saveTo, JSON.stringify(yarnLockSyncIntoPackageJson(JSON.parse(packageJsonString), yarnLockObj), null, 2) + "\n", (e) => console.log('done', e ? e : ''));
     }));
 });
 
