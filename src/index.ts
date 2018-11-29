@@ -13,7 +13,7 @@ program
     .option('-d, --dir <path>', 'directory path where the yarn.lock file is located (default to current directory)')
     .option('-p, --dirPackageJson <path>', 'directory of project with target package.json, if not set, -d will be used')
     .option('-s, --save', 'By default don\'t override the package.json file, make a new one instead package.json.yarn ')
-    .option('-k, --keepUpArrow', 'By default the ^ or any other dynamic numbers are removed and replaced with static ones.')
+    .option('-k, --keepPrefix', 'By default the ^ or any other dynamic numbers are removed and replaced with static ones.')
     .option('-g, --keepGit', 'By default direct git repositories are also replaced by the version written in yarn.')
     .option('-l, --keepLink', 'By default direct link: repositories are also replaced by the version written in yarn.')
     .option('-a, --keepVariable <variable>', 'By default everything is converted to yarn version, write a part of the type you wish not to convert, seperate by comma if more than one, to not replace git and link you would use +,link:')
@@ -27,7 +27,12 @@ const proccessVersion = (newVersion, currentVersion) => {
         return currentVersion;
     if (program.keepVariable && program.keepVariable.split(',').find(f => currentVersion.includes(f)))
         return currentVersion;
-    return program.keepUpArrow ? `^${newVersion}` : newVersion;
+    if (program.keepPrefix) {
+      const match = currentVersion.match(/(^[\^><=]+)/);
+      const range = match ? match[0] : '';
+      return range + newVersion;
+    }
+    return newVersion;
 }
 
 
