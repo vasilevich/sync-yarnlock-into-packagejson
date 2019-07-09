@@ -2,7 +2,7 @@
 
 
 # syncyarnlock
-Syncs `yarn.lock` versions into an exsisting `package.json` file, removing dynamic numbers such as with ^, keeping static versions intact.
+Syncs `yarn.lock` versions into an existing `package.json` file, removing dynamic numbers such as with ^, keeping static versions intact.
 ## Install
 #### YARN
 ```bash
