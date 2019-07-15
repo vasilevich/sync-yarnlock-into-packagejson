@@ -30,13 +30,15 @@
   "author": "Yosef Langer",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "6.0.31",
-    "rimraf": "^2.6.2",
-    "ts-node": "^1.2.1",
-    "typescript": "^2.1.0-dev.20160724"
+    "@types/glob": "^7.1.1",
+    "@types/node": "12.6.3",
+    "rimraf": "^2.6.3",
+    "ts-node": "^8.3.0",
+    "typescript": "^3.5.3"
   },
   "dependencies": {
-    "commander": "^2.11.0",
+    "commander": "^2.20.0",
+    "glob": "^7.1.4",
     "yarn-lock-convert": "^1.0.2"
   }
 }
