@@ -2,6 +2,7 @@
 'use strict';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as glob from 'glob';
 
 const program = require('commander');
 import * as yarnconverter from 'yarn-lock-convert';
@@ -55,11 +56,24 @@ const yarnLockSyncIntoPackageJson = (packageJsonObject, yarnLockObject) => {
 
 const dir = program.dir ? program.dir : process.cwd();
 const packageDir = program.dirPackageJson ? program.dirPackageJson : dir;
-const saveTo = path.resolve(packageDir, program.save ? 'package.json' : 'package.json.yarn');
 yarnconverter.toObject().then((yarnLockObj) => {
-    (fs.readFile(path.resolve(packageDir, 'package.json'), 'utf8', (err, packageJsonString) => {
-        fs.writeFile(saveTo, JSON.stringify(yarnLockSyncIntoPackageJson(JSON.parse(packageJsonString), yarnLockObj), null, 2) + "\n", (e) => console.log('done', e ? e : ''));
-    }));
+    updatePackage(path.resolve(packageDir, 'package.json'));
+
+    // Only the root package.json file contains a workspaces field
+    // But to simplify the code we don't seperate the logic
+    function updatePackage(jsonPath: string) {
+        const packageJson = require(jsonPath);
+
+        if (packageJson.workspaces) {
+            packageJson.workspaces.forEach((packagePath: string) => {
+                const packages = glob.sync(`${packagePath}${packagePath.endsWith('/') ? '' : '/'}`, { absolute: true });
+                packages.forEach(x => updatePackage(path.join(x, 'package.json')));
+            });
+        }
+
+        const saveTo = path.resolve(path.dirname(jsonPath), program.save ? 'package.json' : 'package.json.yarn');
+        fs.writeFile(saveTo, JSON.stringify(yarnLockSyncIntoPackageJson(packageJson, yarnLockObj), null, 2) + "\n", e => console.log('Updated %s', jsonPath, e ? e : ''));
+    }
 });
 
 
