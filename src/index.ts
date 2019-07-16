@@ -79,7 +79,12 @@ yarnconverter.toObject().then((yarnLockObj) => {
 
         const saveTo = path.resolve(path.dirname(jsonPath), program.save ? 'package.json' : 'package.json.yarn');
         const newPackageJsonText = (JSON.stringify(yarnLockSyncIntoPackageJson(packageJson, yarnLockObj), null, 2) + '\n').replace(/\r?\n/g, getLineFeed(packageJsonText));
-        fs.writeFile(saveTo, newPackageJsonText, e => console.log('Saved %s', saveTo, e ? e : ''));
+        if (!program.save || packageJsonText !== newPackageJsonText) {
+            fs.writeFile(saveTo, newPackageJsonText, e => console.log('Saved %s', saveTo, e ? e : ''));
+        }
+        else {
+            console.log("No changes to %s", saveTo)
+        }
     }
 });
 
