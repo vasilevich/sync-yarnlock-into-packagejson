@@ -2,6 +2,7 @@
 'use strict';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
 import * as glob from 'glob';
 
 const program = require('commander');
@@ -53,6 +54,10 @@ const yarnLockSyncIntoPackageJson = (packageJsonObject, yarnLockObject) => {
     return packageJsonObject;
 };
 
+function getLineFeed(source: string) {
+    const match = source.match(/\r?\n/);
+    return match === null ? os.EOL : match[0];
+}
 
 const dir = program.dir ? program.dir : process.cwd();
 const packageDir = program.dirPackageJson ? program.dirPackageJson : dir;
@@ -62,7 +67,8 @@ yarnconverter.toObject().then((yarnLockObj) => {
     // Only the root package.json file contains a workspaces field
     // But to simplify the code we don't seperate the logic
     function updatePackage(jsonPath: string) {
-        const packageJson = require(jsonPath);
+        const packageJsonText = fs.readFileSync(jsonPath, 'utf8');
+        const packageJson = JSON.parse(packageJsonText);
 
         if (packageJson.workspaces) {
             packageJson.workspaces.forEach((packagePath: string) => {
@@ -72,7 +78,13 @@ yarnconverter.toObject().then((yarnLockObj) => {
         }
 
         const saveTo = path.resolve(path.dirname(jsonPath), program.save ? 'package.json' : 'package.json.yarn');
-        fs.writeFile(saveTo, JSON.stringify(yarnLockSyncIntoPackageJson(packageJson, yarnLockObj), null, 2) + "\n", e => console.log('Updated %s', jsonPath, e ? e : ''));
+        const newPackageJsonText = (JSON.stringify(yarnLockSyncIntoPackageJson(packageJson, yarnLockObj), null, 2) + '\n').replace(/\r?\n/g, getLineFeed(packageJsonText));
+        if (!program.save || packageJsonText !== newPackageJsonText) {
+            fs.writeFile(saveTo, newPackageJsonText, e => console.log('Saved %s', saveTo, e ? e : ''));
+        }
+        else {
+            console.log("No changes to %s", saveTo)
+        }
     }
 });
 
