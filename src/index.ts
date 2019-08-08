@@ -30,7 +30,7 @@ const proccessVersion = (newVersion, currentVersion) => {
     if (program.keepVariable && program.keepVariable.split(',').find(f => currentVersion.includes(f)))
         return currentVersion;
     if (program.keepPrefix) {
-      const match = currentVersion.match(/(^[\^><=]+)/);
+      const match = currentVersion.match(/(^[\^><=~]+)/);
       const range = match ? match[0] : '';
       return range + newVersion;
     }
@@ -52,7 +52,7 @@ const yarnLockSyncIntoPackageJson = (packageJsonObject, yarnLockObject) => {
         }
     });
     return packageJsonObject;
-};
+};~
 
 function getLineFeed(source: string) {
     const match = source.match(/\r?\n/);
