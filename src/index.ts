@@ -52,7 +52,7 @@ const yarnLockSyncIntoPackageJson = (packageJsonObject, yarnLockObject) => {
         }
     });
     return packageJsonObject;
-};~
+};
 
 function getLineFeed(source: string) {
     const match = source.match(/\r?\n/);
