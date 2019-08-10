@@ -30,7 +30,7 @@ const proccessVersion = (newVersion, currentVersion) => {
     if (program.keepVariable && program.keepVariable.split(',').find(f => currentVersion.includes(f)))
         return currentVersion;
     if (program.keepPrefix) {
-      const match = currentVersion.match(/(^[\^><=]+)/);
+      const match = currentVersion.match(/(^[\^><=~]+)/);
       const range = match ? match[0] : '';
       return range + newVersion;
     }
