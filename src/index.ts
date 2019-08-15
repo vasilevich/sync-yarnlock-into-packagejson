@@ -71,7 +71,8 @@ yarnconverter.toObject().then((yarnLockObj) => {
         const packageJson = JSON.parse(packageJsonText);
 
         if (packageJson.workspaces) {
-            packageJson.workspaces.forEach((packagePath: string) => {
+            const packagePaths = packageJson.workspaces.packages || packageJson.workspaces;
+            packagePaths.forEach((packagePath: string) => {
                 const packages = glob.sync(`${packagePath}${packagePath.endsWith('/') ? '' : '/'}`, { absolute: true });
                 packages.forEach(x => updatePackage(path.join(x, 'package.json')));
             });
