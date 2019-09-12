@@ -4,9 +4,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import * as glob from 'glob';
+import * as childProcess from 'child_process';
 
-const program = require('commander');
-import * as yarnconverter from 'yarn-lock-convert';
+import program = require('commander');
 
 
 program
@@ -37,18 +37,18 @@ const proccessVersion = (newVersion, currentVersion) => {
     return newVersion;
 }
 
+interface IDependency {
+    name: string;
+    version: string
+}
 
-const yarnLockSyncIntoPackageJson = (packageJsonObject, yarnLockObject) => {
-    const yarnLock = Object.keys(yarnLockObject).map(key => ({
-        key: key.slice(0, key.lastIndexOf('@')),
-        version: yarnLockObject[key].version
-    }));
-    yarnLock.forEach(dependency => {
-        if (packageJsonObject.dependencies && dependency.key in packageJsonObject.dependencies) {
-            packageJsonObject.dependencies[dependency.key] = proccessVersion(dependency.version, packageJsonObject.dependencies[dependency.key]);
+const yarnLockSyncIntoPackageJson = (packageJsonObject, dependencies: Array<IDependency>) => {
+    dependencies.forEach(dependency => {
+        if (packageJsonObject.dependencies && dependency.name in packageJsonObject.dependencies) {
+            packageJsonObject.dependencies[dependency.name] = proccessVersion(dependency.version, packageJsonObject.dependencies[dependency.name]);
         }
-        else if (packageJsonObject.devDependencies && dependency.key in packageJsonObject.devDependencies) {
-            packageJsonObject.devDependencies[dependency.key] = proccessVersion(dependency.version, packageJsonObject.devDependencies[dependency.key]);
+        else if (packageJsonObject.devDependencies && dependency.name in packageJsonObject.devDependencies) {
+            packageJsonObject.devDependencies[dependency.name] = proccessVersion(dependency.version, packageJsonObject.devDependencies[dependency.name]);
         }
     });
     return packageJsonObject;
@@ -59,34 +59,43 @@ function getLineFeed(source: string) {
     return match === null ? os.EOL : match[0];
 }
 
+// Only the root package.json file contains a workspaces field
+// But to simplify the code we don't seperate the logic
+function updatePackage(jsonPath: string, lockedPackages: Array<IDependency>) {
+    const packageJsonText = fs.readFileSync(jsonPath, 'utf8');
+    const packageJson = JSON.parse(packageJsonText);
+
+    if (packageJson.workspaces) {
+        const packagePaths = packageJson.workspaces.packages || packageJson.workspaces;
+        packagePaths.forEach((packagePath: string) => {
+            const packages = glob.sync(`${packagePath}${packagePath.endsWith('/') ? '' : '/'}`, { absolute: true });
+            packages.forEach(x => updatePackage(path.join(x, 'package.json'), lockedPackages));
+        });
+    }
+
+    const saveTo = path.resolve(path.dirname(jsonPath), program.save ? 'package.json' : 'package.json.yarn');
+    const newPackageJsonText = (JSON.stringify(yarnLockSyncIntoPackageJson(packageJson, lockedPackages), null, 2) + '\n').replace(/\r?\n/g, getLineFeed(packageJsonText));
+    if (!program.save || packageJsonText !== newPackageJsonText) {
+        fs.writeFile(saveTo, newPackageJsonText, e => console.log('Saved %s', saveTo, e ? e : ''));
+    }
+    else {
+        console.log("No changes to %s", saveTo)
+    }
+}
+
 const dir = program.dir ? program.dir : process.cwd();
 const packageDir = program.dirPackageJson ? program.dirPackageJson : dir;
-yarnconverter.toObject().then((yarnLockObj) => {
-    updatePackage(path.resolve(packageDir, 'package.json'));
 
-    // Only the root package.json file contains a workspaces field
-    // But to simplify the code we don't seperate the logic
-    function updatePackage(jsonPath: string) {
-        const packageJsonText = fs.readFileSync(jsonPath, 'utf8');
-        const packageJson = JSON.parse(packageJsonText);
+const directDepsLines = childProcess.execSync("yarn list --depth=0");
 
-        if (packageJson.workspaces) {
-            const packagePaths = packageJson.workspaces.packages || packageJson.workspaces;
-            packagePaths.forEach((packagePath: string) => {
-                const packages = glob.sync(`${packagePath}${packagePath.endsWith('/') ? '' : '/'}`, { absolute: true });
-                packages.forEach(x => updatePackage(path.join(x, 'package.json')));
-            });
-        }
-
-        const saveTo = path.resolve(path.dirname(jsonPath), program.save ? 'package.json' : 'package.json.yarn');
-        const newPackageJsonText = (JSON.stringify(yarnLockSyncIntoPackageJson(packageJson, yarnLockObj), null, 2) + '\n').replace(/\r?\n/g, getLineFeed(packageJsonText));
-        if (!program.save || packageJsonText !== newPackageJsonText) {
-            fs.writeFile(saveTo, newPackageJsonText, e => console.log('Saved %s', saveTo, e ? e : ''));
-        }
-        else {
-            console.log("No changes to %s", saveTo)
-        }
-    }
+const directDeps = directDepsLines.toString().split(/\r?\n/).map(dep => {
+    console.log(dep);
+    const nameAndVersion = dep.slice(3);
+    const sep = nameAndVersion.lastIndexOf('@');
+    return {
+        name: nameAndVersion.slice(0, sep),
+        version: nameAndVersion.slice(sep + 1)
+    };
 });
 
-
+updatePackage(path.resolve(packageDir, 'package.json'), directDeps);
