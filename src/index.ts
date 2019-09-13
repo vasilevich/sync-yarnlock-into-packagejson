@@ -42,13 +42,17 @@ interface IDependency {
     version: string
 }
 
-const yarnLockSyncIntoPackageJson = (packageJsonObject, dependencies: Array<IDependency>) => {
-    dependencies.forEach(dependency => {
-        if (packageJsonObject.dependencies && dependency.name in packageJsonObject.dependencies) {
-            packageJsonObject.dependencies[dependency.name] = proccessVersion(dependency.version, packageJsonObject.dependencies[dependency.name]);
+const syncDepsIntoPackageJson = (packageJsonObject, deps) => {
+    deps.forEach(dependency => {
+        const sep = dependency.name.lastIndexOf('@');
+        const name = dependency.name.slice(0, sep);
+        const version = dependency.name.slice(sep + 1);
+
+        if (packageJsonObject.dependencies && name in packageJsonObject.dependencies) {
+            packageJsonObject.dependencies[name] = proccessVersion(version, packageJsonObject.dependencies[name]);
         }
-        else if (packageJsonObject.devDependencies && dependency.name in packageJsonObject.devDependencies) {
-            packageJsonObject.devDependencies[dependency.name] = proccessVersion(dependency.version, packageJsonObject.devDependencies[dependency.name]);
+        else if (packageJsonObject.devDependencies && name in packageJsonObject.devDependencies) {
+            packageJsonObject.devDependencies[name] = proccessVersion(version, packageJsonObject.devDependencies[name]);
         }
     });
     return packageJsonObject;
@@ -61,41 +65,36 @@ function getLineFeed(source: string) {
 
 // Only the root package.json file contains a workspaces field
 // But to simplify the code we don't seperate the logic
-function updatePackage(jsonPath: string, lockedPackages: Array<IDependency>) {
+function updatePackage(jsonPath: string, rootDeps) {
     const packageJsonText = fs.readFileSync(jsonPath, 'utf8');
     const packageJson = JSON.parse(packageJsonText);
-
-    if (packageJson.workspaces) {
-        const packagePaths = packageJson.workspaces.packages || packageJson.workspaces;
-        packagePaths.forEach((packagePath: string) => {
-            const packages = glob.sync(`${packagePath}${packagePath.endsWith('/') ? '' : '/'}`, { absolute: true });
-            packages.forEach(x => updatePackage(path.join(x, 'package.json'), lockedPackages));
-        });
-    }
-
     const saveTo = path.resolve(path.dirname(jsonPath), program.save ? 'package.json' : 'package.json.yarn');
-    const newPackageJsonText = (JSON.stringify(yarnLockSyncIntoPackageJson(packageJson, lockedPackages), null, 2) + '\n').replace(/\r?\n/g, getLineFeed(packageJsonText));
+
+    const workspacePackageDeps = (rootDeps.find(dep => dep.name.startsWith(`${packageJson.name}@`)) || {}).children || [];
+    const syncedDeps = syncDepsIntoPackageJson(packageJson, rootDeps.concat(workspacePackageDeps));
+    const newPackageJsonText = (JSON.stringify(syncedDeps, null, 2) + '\n').replace(/\r?\n/g, getLineFeed(packageJsonText));
     if (!program.save || packageJsonText !== newPackageJsonText) {
         fs.writeFile(saveTo, newPackageJsonText, e => console.log('Saved %s', saveTo, e ? e : ''));
     }
     else {
         console.log("No changes to %s", saveTo)
     }
+
+    if (packageJson.workspaces) {
+        const packagePaths = packageJson.workspaces.packages || packageJson.workspaces;
+        packagePaths.forEach((packagePath: string) => {
+            const packages = glob.sync(`${packagePath}${packagePath.endsWith('/') ? '' : '/'}`, { absolute: true });
+            packages.forEach(workspaceDir => {
+                const workspacePackageJson = path.join(workspaceDir, 'package.json');
+                updatePackage(workspacePackageJson, rootDeps);
+            });
+        });
+    }
 }
 
 const dir = program.dir ? program.dir : process.cwd();
 const packageDir = program.dirPackageJson ? program.dirPackageJson : dir;
 
-const directDepsLines = childProcess.execSync("yarn list --depth=0");
+const depsTree = JSON.parse(childProcess.execSync("yarn list --json --depth 1").toString()).data.trees;
 
-const directDeps = directDepsLines.toString().split(/\r?\n/).map(dep => {
-    console.log(dep);
-    const nameAndVersion = dep.slice(3);
-    const sep = nameAndVersion.lastIndexOf('@');
-    return {
-        name: nameAndVersion.slice(0, sep),
-        version: nameAndVersion.slice(sep + 1)
-    };
-});
-
-updatePackage(path.resolve(packageDir, 'package.json'), directDeps);
+updatePackage(path.resolve(packageDir, 'package.json'), depsTree);
