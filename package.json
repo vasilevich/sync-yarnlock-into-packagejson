@@ -38,7 +38,6 @@
   },
   "dependencies": {
     "commander": "^2.20.0",
-    "glob": "^7.1.4",
-    "yarn-lock-convert": "^1.0.2"
+    "glob": "^7.1.4"
   }
 }
