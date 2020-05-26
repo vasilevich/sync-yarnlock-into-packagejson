@@ -82,13 +82,15 @@ function updatePackage(jsonPath: string, rootDeps) {
 
     if (packageJson.workspaces) {
         const packagePaths = packageJson.workspaces.packages || packageJson.workspaces;
-        packagePaths.forEach((packagePath: string) => {
-            const packages = glob.sync(`${packagePath}${packagePath.endsWith('/') ? '' : '/'}`, { absolute: true });
-            packages.forEach(workspaceDir => {
-                const workspacePackageJson = path.join(workspaceDir, 'package.json');
-                updatePackage(workspacePackageJson, rootDeps);
+        if(Array.isArray(packagePaths)) {
+            packagePaths.forEach((packagePath: string) => {
+                const packages = glob.sync(`${packagePath}${packagePath.endsWith('/') ? '' : '/'}`, { absolute: true });
+                packages.forEach(workspaceDir => {
+                    const workspacePackageJson = path.join(workspaceDir, 'package.json');
+                    updatePackage(workspacePackageJson, rootDeps);
+                });
             });
-        });
+        }
     }
 }
 
