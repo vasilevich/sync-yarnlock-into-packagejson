@@ -66,6 +66,7 @@ function getLineFeed(source: string) {
 // Only the root package.json file contains a workspaces field
 // But to simplify the code we don't seperate the logic
 function updatePackage(jsonPath: string, rootDeps) {
+    if (!fs.existsSync(jsonPath)) return;
     const packageJsonText = fs.readFileSync(jsonPath, 'utf8');
     const packageJson = JSON.parse(packageJsonText);
     const saveTo = path.resolve(path.dirname(jsonPath), program.save ? 'package.json' : 'package.json.yarn');
