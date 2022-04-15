@@ -1,6 +1,7 @@
 {
   "recommendations": [
     "EditorConfig.EditorConfig",
+    "esbenp.prettier-vscode",
     "streetsidesoftware.code-spell-checker"
   ]
 }
