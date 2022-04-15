@@ -1,13 +1,12 @@
 {
   "env": "node",
   "compilerOptions": {
-    "declaration": true,
-    "module": "commonjs",
+    "esModuleInterop": true,
+    "module": "System",
     "moduleResolution": "node",
+    "outFile": "lib/syncpackagejson.js",
     "noImplicitAny": false,
-    "outDir": "lib",
-    "preserveConstEnums": true,
-    "removeComments": true,
-    "target": "es5"
+    "strict": true,
+    "target": "es2020"
   }
 }
