@@ -2,7 +2,6 @@
   "name": "syncpackagejson",
   "version": "1.0.19",
   "description": "Sync installed versions of npm packages into package.json.",
-  "typings": "./lib/index.d.ts",
   "scripts": {
     "build": "rimraf lib/ && tsc"
   },
