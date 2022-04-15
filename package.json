@@ -8,10 +8,6 @@
   "bin": {
     "syncpackagejson": "./bin/syncpackagejson.js"
   },
-  "files": [
-    "bin",
-    "lib"
-  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/janaagaard75/syncpackagejson"
