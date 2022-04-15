@@ -10,11 +10,6 @@
   "bin": {
     "syncpackagejson": "./lib/index.js"
   },
-  "keywords": [
-    "typescript",
-    "node",
-    "modules"
-  ],
   "files": [
     "lib",
     "LICENSE"
