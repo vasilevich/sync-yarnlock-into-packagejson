@@ -1,8 +1,8 @@
-import * as childProcess from "child_process";
-import * as fs from "fs";
-import * as glob from "glob";
-import * as os from "os";
-import * as path from "path";
+import childProcess from "child_process";
+import { promises as fs } from "fs";
+import glob from "glob";
+import os from "os";
+import path from "path";
 
 import program = require("commander");
 
@@ -94,9 +94,12 @@ function getLineFeed(source: string) {
 }
 
 // Only the root package.json file contains a workspaces field but to simplify the code we don't separate the logic.
-function updatePackage(jsonPath: string, rootDeps) {
-  if (!fs.existsSync(jsonPath)) return;
-  const packageJsonText = fs.readFileSync(jsonPath, "utf8");
+async function updatePackage(jsonPath: string, rootDeps) {
+  if (!(await fs.stat(jsonPath))) {
+    return;
+  }
+
+  const packageJsonText = await fs.readFile(jsonPath, "utf8");
   const packageJson = JSON.parse(packageJsonText);
   const saveTo = path.resolve(
     path.dirname(jsonPath),
@@ -114,9 +117,11 @@ function updatePackage(jsonPath: string, rootDeps) {
     JSON.stringify(syncedDeps, null, 2) + "\n"
   ).replace(/\r?\n/g, getLineFeed(packageJsonText));
   if (!program.save || packageJsonText !== newPackageJsonText) {
-    fs.writeFile(saveTo, newPackageJsonText, (e) =>
-      console.log("Saved %s", saveTo, e ? e : "")
-    );
+    try {
+      await fs.writeFile(saveTo, newPackageJsonText);
+    } catch (error) {
+      console.error("Saved %s", saveTo, error);
+    }
   } else {
     console.log("No changes to %s", saveTo);
   }
@@ -125,16 +130,16 @@ function updatePackage(jsonPath: string, rootDeps) {
     const packagePaths =
       packageJson.workspaces.packages || packageJson.workspaces;
     if (Array.isArray(packagePaths)) {
-      packagePaths.forEach((packagePath: string) => {
+      for (const packagePath of packagePaths) {
         const packages = glob.sync(
           `${packagePath}${packagePath.endsWith("/") ? "" : "/"}`,
           { absolute: true }
         );
-        packages.forEach((workspaceDir) => {
+        for (const workspaceDir of packages) {
           const workspacePackageJson = path.join(workspaceDir, "package.json");
-          updatePackage(workspacePackageJson, rootDeps);
-        });
-      });
+          await updatePackage(workspacePackageJson, rootDeps);
+        }
+      }
     }
   }
 }
