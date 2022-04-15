@@ -2,21 +2,18 @@
   "name": "syncpackagejson",
   "version": "1.0.19",
   "description": "Sync installed versions of npm packages into package.json.",
-  "scripts": {
-    "build": "rimraf lib/ && tsc"
-  },
+  "author": "Jan Aagaard <jan@aagaard.net>",
+  "license": "MIT",
   "bin": {
     "syncpackagejson": "./bin/syncpackagejson.js"
+  },
+  "scripts": {
+    "build": "rimraf lib/ && tsc"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/janaagaard75/syncpackagejson"
   },
-  "bugs": {
-    "url": "https://github.com/janaagaard75/syncpackagejson/issues"
-  },
-  "author": "Jan Aagaard <jan@aagaard.net>",
-  "license": "MIT",
   "dependencies": {
     "commander": "^2.20.0",
     "glob": "^7.1.4"
