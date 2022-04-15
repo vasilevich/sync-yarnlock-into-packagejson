@@ -142,8 +142,7 @@ function updatePackage(jsonPath: string, rootDeps) {
 const dir = program.dir ? program.dir : process.cwd();
 const packageDir = program.dirPackageJson ? program.dirPackageJson : dir;
 
-const depsTree = JSON.parse(
-  childProcess.execSync("yarn list --json --depth 1").toString()
-).data.trees;
+const depsTree = JSON.parse(childProcess.execSync("npm list --json").toString())
+  .data.trees;
 
 updatePackage(path.resolve(packageDir, "package.json"), depsTree);
