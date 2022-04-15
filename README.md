@@ -1,53 +1,31 @@
-[![npm version](https://badge.fury.io/js/syncyarnlock.svg)](https://www.npmjs.com/package/syncyarnlock)
+# syncpackagejson
 
-# syncyarnlock
-
-Syncs `yarn.lock` versions into an existing `package.json` file, removing dynamic numbers such as with ^, keeping static versions intact.
-
-## Install
-
-#### YARN
-
-```bash
-yarn global add syncyarnlock
-```
-
-### or
-
-#### NPM
-
-```bash
-npm install -g syncyarnlock
-```
+Sync installed versions of npm packages into package.json.
 
 ## Usage
 
 ```
-  Usage: syncyarnlock [options]
+  Usage: npx syncpackagejson [options]
 
-  Sync `yarn.lock` package versions, into package.json
-
+  Sync installed versions of npm packages into package.json.
 
   Options:
 
-    -V, --version                output the version number
-    -d, --dir <path>             directory path where the yarn.lock file is located (default to current directory)
-    -p, --dirPackageJson <path>  directory of project with target package.json, if not set, -d will be used
-    -s, --save                   By default don't override the package.json file, make a new one instead package.json.yarn
-    -k, --keepPrefix             By default the ^ or any other dynamic numbers are removed and replaced with static ones.
-    -g, --keepGit                By default direct git repositories are also replaced by the version written in yarn.
-    -l, --keepLink               By default direct link: repositories are also replaced by the version written in yarn.
-    -a, --keepVariable <variable>By default everything is converted to yarn version, write a part of the type you wish not to convert, seperate by comma if more than one, to not replace git and link you would use +,link:
-    -h, --help                   output usage information
-  Transforms yarn.lock files to JSON
+    -V, --version                 Output the version number.
+    -d, --dir <path>              Directory path where the yarn.lock file is located (default to current directory).
+    -p, --dirPackageJson <path>   Directory of project with target package.json, if not set, -d will be used.
+    -s, --save                    By default don't override the package.json file, make a new one instead package.json.yarn.
+    -k, --keepPrefix              By default the ^ or any other dynamic numbers are removed and replaced with static ones.
+    -g, --keepGit                 By default direct git repositories are also replaced by the version written in yarn.
+    -l, --keepLink                By default direct link: repositories are also replaced by the version written in yarn.
+    -a, --keepVariable <variable> By default everything is converted to yarn version. Write a part of the type you wish not to convert, separate by comma if more than one. To not replace git and link you would use +,link:.
+    -h, --help                    Output usage information.
 
-  Examples:
-  //perform inside a directory with yarn.lock and package.json, will output package.json.yarn in the same directory.
-  syncyarnlock
-
-
+  Example:
+  // Run this command in folder with a package.json file.
+  npx syncpackagejson --keepPrefix --save
 ```
 
 ## Credits
 
-[zimbatm](https://github.com/zimbatm) - forked [this project ](https://github.com/numtide/yarnlock2json) from theirs, and modified to my needs.
+This is a fork of [syncyarnlock](https://github.com/vasilevich/sync-yarnlock-into-packagejson).

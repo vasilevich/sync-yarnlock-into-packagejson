@@ -1,7 +1,7 @@
 {
-  "name": "syncyarnlock",
+  "name": "syncpackagejson",
   "version": "1.0.19",
-  "description": "Syncs yarn.lock versions into an exsisting package.json file, removing dynamic numbers such as with ^, keeping static versions intact.",
+  "description": "Sync installed versions of npm packages into package.json.",
   "main": "./lib/index.js",
   "typings": "./lib/index.d.ts",
   "scripts": {
@@ -9,7 +9,7 @@
   },
   "preferGlobal": "true",
   "bin": {
-    "syncyarnlock": "./lib/index.js"
+    "syncpackagejson": "./lib/index.js"
   },
   "keywords": [
     "typescript",
@@ -29,15 +29,15 @@
   },
   "author": "Yosef Langer",
   "license": "MIT",
+  "dependencies": {
+    "commander": "^2.20.0",
+    "glob": "^7.1.4"
+  },
   "devDependencies": {
     "@types/glob": "^7.1.1",
     "@types/node": "12.6.3",
     "rimraf": "^2.6.3",
     "ts-node": "^8.3.0",
     "typescript": "^3.5.3"
-  },
-  "dependencies": {
-    "commander": "^2.20.0",
-    "glob": "^7.1.4"
   }
 }
