@@ -1,19 +1,24 @@
 [![npm version](https://badge.fury.io/js/syncyarnlock.svg)](https://www.npmjs.com/package/syncyarnlock)
 
-
 # syncyarnlock
+
 Syncs `yarn.lock` versions into an existing `package.json` file, removing dynamic numbers such as with ^, keeping static versions intact.
+
 ## Install
+
 #### YARN
+
 ```bash
 yarn global add syncyarnlock
 ```
-### or     
+
+### or
+
 #### NPM
+
 ```bash
 npm install -g syncyarnlock
 ```
-
 
 ## Usage
 
@@ -35,13 +40,14 @@ npm install -g syncyarnlock
     -a, --keepVariable <variable>By default everything is converted to yarn version, write a part of the type you wish not to convert, seperate by comma if more than one, to not replace git and link you would use +,link:
     -h, --help                   output usage information
   Transforms yarn.lock files to JSON
-  
+
   Examples:
   //perform inside a directory with yarn.lock and package.json, will output package.json.yarn in the same directory.
-  syncyarnlock   
-  
+  syncyarnlock
+
 
 ```
 
 ## Credits
+
 [zimbatm](https://github.com/zimbatm) - forked [this project ](https://github.com/numtide/yarnlock2json) from theirs, and modified to my needs.
