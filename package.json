@@ -7,7 +7,6 @@
   "scripts": {
     "compile": "rimraf lib/ && tsc"
   },
-  "preferGlobal": "true",
   "bin": {
     "syncpackagejson": "./lib/index.js"
   },
