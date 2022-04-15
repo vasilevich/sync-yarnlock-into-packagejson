@@ -143,6 +143,6 @@ const dir = program.dir ? program.dir : process.cwd();
 const packageDir = program.dirPackageJson ? program.dirPackageJson : dir;
 
 const depsTree = JSON.parse(childProcess.execSync("npm list --json").toString())
-  .data.trees;
+  .data.dependencies;
 
 updatePackage(path.resolve(packageDir, "package.json"), depsTree);
