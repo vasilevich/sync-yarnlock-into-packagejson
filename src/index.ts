@@ -95,8 +95,7 @@ function getLineFeed(source: string) {
   return match === null ? os.EOL : match[0];
 }
 
-// Only the root package.json file contains a workspaces field
-// But to simplify the code we don't seperate the logic
+// Only the root package.json file contains a workspaces field but to simplify the code we don't separate the logic.
 function updatePackage(jsonPath: string, rootDeps) {
   if (!fs.existsSync(jsonPath)) return;
   const packageJsonText = fs.readFileSync(jsonPath, "utf8");
