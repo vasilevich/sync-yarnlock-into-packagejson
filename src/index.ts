@@ -37,11 +37,11 @@ program
   )
   .option(
     "-a, --keepVariable <variable>",
-    "By default everything is converted to yarn version, write a part of the type you wish not to convert, seperate by comma if more than one, to not replace git and link you would use +,link:"
+    "By default everything is converted to yarn version, write a part of the type you wish not to convert, separate by comma if more than one, to not replace git and link you would use +,link:"
   )
   .parse(process.argv);
 
-const proccessVersion = (newVersion, currentVersion) => {
+const processVersion = (newVersion, currentVersion) => {
   if (program.keepGit && currentVersion.includes("+")) return currentVersion;
   if (program.keepLink && currentVersion.includes("link:"))
     return currentVersion;
@@ -73,7 +73,7 @@ const syncDepsIntoPackageJson = (packageJsonObject, deps) => {
       packageJsonObject.dependencies &&
       name in packageJsonObject.dependencies
     ) {
-      packageJsonObject.dependencies[name] = proccessVersion(
+      packageJsonObject.dependencies[name] = processVersion(
         version,
         packageJsonObject.dependencies[name]
       );
@@ -81,7 +81,7 @@ const syncDepsIntoPackageJson = (packageJsonObject, deps) => {
       packageJsonObject.devDependencies &&
       name in packageJsonObject.devDependencies
     ) {
-      packageJsonObject.devDependencies[name] = proccessVersion(
+      packageJsonObject.devDependencies[name] = processVersion(
         version,
         packageJsonObject.devDependencies[name]
       );
