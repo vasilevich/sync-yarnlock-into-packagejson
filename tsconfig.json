@@ -1,15 +1,15 @@
 {
   "env": "node",
   "compilerOptions": {
-    "target": "es5",
+    "declaration": true,
     "module": "commonjs",
     "moduleResolution": "node",
     "noImplicitAny": false,
-    "removeComments": true,
-    "preserveConstEnums": true,
-    "sourceMap": true,
     "outDir": "lib",
-    "declaration": true
+    "preserveConstEnums": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "target": "es5"
   },
   "exclude": [
     "test",
