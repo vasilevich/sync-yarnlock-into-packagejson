@@ -16,12 +16,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vasilevich/sync-yarnlock-into-packagejson"
+    "url": "git+https://github.com/janaagaard75/syncpackagejson"
   },
   "bugs": {
-    "url": "https://github.com/vasilevich/sync-yarnlock-into-packagejson/issues"
+    "url": "https://github.com/janaagaard75/syncpackagejson/issues"
   },
-  "author": "Yosef Langer",
+  "author": "Jan Aagaard <jan@aagaard.net>",
   "license": "MIT",
   "dependencies": {
     "commander": "^2.20.0",
