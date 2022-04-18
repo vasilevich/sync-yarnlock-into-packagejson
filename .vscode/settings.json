@@ -1,5 +1,5 @@
 {
-  "cSpell.words": ["Aagaard", "syncpackagejson"],
+  "cSpell.words": ["Aagaard", "syncpackagejson", "syncyarnlock"],
   "editor.codeActionsOnSave": {
     "source.organizeImports": true
   },
