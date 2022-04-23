@@ -1,6 +1,6 @@
 import childProcess from "child_process";
 import program from "commander";
-import { promises as fs } from "fs";
+import fs from "fs";
 import os from "os";
 import path from "path";
 import { NpmList, PackageJson, PackageVersionsAndUrls } from "./types";
@@ -94,15 +94,12 @@ function getEolCharacter(source: string) {
 }
 
 // Only the root package.json file contains a workspaces field but to simplify the code we don't separate the logic.
-async function updatePackageJson(
-  jsonPath: string,
-  rootDeps: PackageVersionsAndUrls
-) {
-  if (!(await fs.stat(jsonPath))) {
+function updatePackageJson(jsonPath: string, rootDeps: PackageVersionsAndUrls) {
+  if (!fs.statSync(jsonPath)) {
     return;
   }
 
-  const packageJsonText = await fs.readFile(jsonPath, "utf8");
+  const packageJsonText = fs.readFileSync(jsonPath, "utf8");
   const originalPackageJson = JSON.parse(packageJsonText) as PackageJson;
   const saveTo = path.resolve(
     path.dirname(jsonPath),
@@ -115,7 +112,7 @@ async function updatePackageJson(
   ).replace(/\r?\n/g, getEolCharacter(packageJsonText));
   if (!program.save || packageJsonText !== newPackageJsonText) {
     try {
-      await fs.writeFile(saveTo, newPackageJsonText);
+      fs.writeFileSync(saveTo, newPackageJsonText);
     } catch (error) {
       console.error("Saved %s", saveTo, error);
     }
