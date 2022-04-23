@@ -4,32 +4,18 @@ import os from "os";
 import path from "path";
 import { NpmList, PackageJson, PackageVersionsAndUrls } from "./types";
 
-const main = () => {
-  const packageJsonPath = path.resolve(process.cwd(), "package.json");
-  const installedPackages = getNpmListOutput().dependencies;
-  synchronizeInstalledVersionsIntoPackageJson(
-    packageJsonPath,
-    installedPackages
-  );
-};
-
-const getNpmListOutput = (): NpmList => {
-  return JSON.parse(childProcess.execSync("npm list --json").toString());
-};
-
 // Only the root package.json file contains a workspaces field but to simplify the code we don't separate the logic.
-const synchronizeInstalledVersionsIntoPackageJson = (
-  packageJsonPath: string,
-  rootDeps: PackageVersionsAndUrls
-) => {
+const synchronizeInstalledVersionsIntoPackageJson = () => {
+  const packageJsonPath = path.resolve(process.cwd(), "package.json");
   if (!fs.statSync(packageJsonPath)) {
     return;
   }
 
+  const installedPackages = getNpmListOutput().dependencies;
   const originalPackageJsonText = fs.readFileSync(packageJsonPath, "utf8");
   const packageJsonObject = JSON.parse(originalPackageJsonText) as PackageJson;
 
-  updatePackageJsonObject(packageJsonObject, rootDeps);
+  updatePackageJsonObject(packageJsonObject, installedPackages);
   const packageJsonEolCharacters = getEolCharacter(originalPackageJsonText);
   const updatedPackageJsonText = getPackageJsonText(
     packageJsonObject,
@@ -72,6 +58,10 @@ const synchronizeInstalledVersionsIntoPackageJson = (
   //     }
   //   }
   // }
+};
+
+const getNpmListOutput = (): NpmList => {
+  return JSON.parse(childProcess.execSync("npm list --json").toString());
 };
 
 const updatePackageJsonObject = (
@@ -150,4 +140,4 @@ const getPackageJsonText = (
   return withCorrectEols;
 };
 
-main();
+synchronizeInstalledVersionsIntoPackageJson();
