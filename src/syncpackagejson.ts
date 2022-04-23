@@ -1,61 +1,21 @@
 import childProcess from "child_process";
-import program from "commander";
 import fs from "fs";
 import os from "os";
 import path from "path";
 import { NpmList, PackageJson, PackageVersionsAndUrls } from "./types";
 
-program
-  .version(require("../package.json").version)
-  .description("Sync `yarn.lock` package versions, into package.json")
-  .option(
-    "-d, --dir <path>",
-    "directory path where the yarn.lock file is located (default to current directory)"
-  )
-  .option(
-    "-p, --dirPackageJson <path>",
-    "directory of project with target package.json, if not set, -d will be used"
-  )
-  .option(
-    "-s, --save",
-    "By default don't override the package.json file, make a new one instead package.json.yarn "
-  )
-  .option(
-    "-k, --keepPrefix",
-    "By default the ^ or any other dynamic numbers are removed and replaced with static ones."
-  )
-  .option(
-    "-g, --keepGit",
-    "By default direct git repositories are also replaced by the version written in yarn."
-  )
-  .option(
-    "-l, --keepLink",
-    "By default direct link: repositories are also replaced by the version written in yarn."
-  )
-  .option(
-    "-a, --keepVariable <variable>",
-    "By default everything is converted to yarn version, write a part of the type you wish not to convert, separate by comma if more than one, to not replace git and link you would use +,link:"
-  )
-  .parse(process.argv);
-
 const getUpdatedVersion = (newVersion: string, currentVersion: string) => {
-  if (program.keepGit && currentVersion.includes("+")) return currentVersion;
-  if (program.keepLink && currentVersion.includes("link:"))
-    return currentVersion;
-  if (
-    program.keepVariable &&
-    (program.keepVariable as string)
-      .split(",")
-      .find((f) => currentVersion.includes(f))
-  ) {
+  if (currentVersion.includes("+")) {
     return currentVersion;
   }
-  if (program.keepPrefix) {
-    const match = currentVersion.match(/(^[\^><=~]+)/);
-    const range = match ? match[0] : "";
-    return range + newVersion;
+
+  if (currentVersion.includes("link:")) {
+    return currentVersion;
   }
-  return newVersion;
+
+  const rangeMatches = currentVersion.match(/(^[\^><=~]+)/);
+  const range = rangeMatches !== null ? rangeMatches[0] : "";
+  return range + newVersion;
 };
 
 const syncIntoPackageJson = (
@@ -94,31 +54,43 @@ function getEolCharacter(source: string) {
 }
 
 // Only the root package.json file contains a workspaces field but to simplify the code we don't separate the logic.
-function updatePackageJson(jsonPath: string, rootDeps: PackageVersionsAndUrls) {
-  if (!fs.statSync(jsonPath)) {
+function updatePackageJson(
+  packageJsonPath: string,
+  rootDeps: PackageVersionsAndUrls
+) {
+  if (!fs.statSync(packageJsonPath)) {
     return;
   }
 
-  const packageJsonText = fs.readFileSync(jsonPath, "utf8");
-  const originalPackageJson = JSON.parse(packageJsonText) as PackageJson;
-  const saveTo = path.resolve(
-    path.dirname(jsonPath),
-    program.save ? "package.json" : "package.json.yarn"
-  );
+  const originalPackageJsonText = fs.readFileSync(packageJsonPath, "utf8");
+  const originalPackageJson = JSON.parse(
+    originalPackageJsonText
+  ) as PackageJson;
 
   const updatedPackageJson = syncIntoPackageJson(originalPackageJson, rootDeps);
-  const newPackageJsonText = (
+  const updatedPackageJsonText = (
     JSON.stringify(updatedPackageJson, null, 2) + "\n"
-  ).replace(/\r?\n/g, getEolCharacter(packageJsonText));
-  if (!program.save || packageJsonText !== newPackageJsonText) {
-    try {
-      fs.writeFileSync(saveTo, newPackageJsonText);
-    } catch (error) {
-      console.error("Saved %s", saveTo, error);
-    }
-  } else {
-    console.log("No changes to %s", saveTo);
+  ).replace(/\r?\n/g, getEolCharacter(originalPackageJsonText));
+
+  if (updatedPackageJsonText === originalPackageJsonText) {
+    console.info(
+      "All package versions in %s match the installed ones.",
+      packageJsonPath
+    );
+    return;
   }
+
+  try {
+    fs.writeFileSync(packageJsonPath, updatedPackageJsonText);
+  } catch (error) {
+    console.error("Error saving %s.", packageJsonPath, error);
+    return;
+  }
+
+  console.info(
+    "Updated package version in %s to match the installed ones.",
+    packageJsonPath
+  );
 
   // if (originalPackageJson.workspaces) {
   //   const packagePaths =
@@ -138,11 +110,8 @@ function updatePackageJson(jsonPath: string, rootDeps: PackageVersionsAndUrls) {
   // }
 }
 
-const dir = program.dir ? program.dir : process.cwd();
-const packageDir = program.dirPackageJson ? program.dirPackageJson : dir;
-
+const packageJsonPath = path.resolve(process.cwd(), "package.json");
 const installedPackages = (
   JSON.parse(childProcess.execSync("npm list --json").toString()) as NpmList
 ).dependencies;
-
-updatePackageJson(path.resolve(packageDir, "package.json"), installedPackages);
+updatePackageJson(packageJsonPath, installedPackages);
