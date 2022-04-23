@@ -110,8 +110,10 @@ const updatePackageJson = (
   // }
 };
 
+const getNpmListOutput = (): NpmList => {
+  return JSON.parse(childProcess.execSync("npm list --json").toString());
+};
+
 const packageJsonPath = path.resolve(process.cwd(), "package.json");
-const installedPackages = (
-  JSON.parse(childProcess.execSync("npm list --json").toString()) as NpmList
-).dependencies;
+const installedPackages = getNpmListOutput().dependencies;
 updatePackageJson(packageJsonPath, installedPackages);
