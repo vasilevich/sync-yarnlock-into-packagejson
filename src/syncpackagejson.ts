@@ -4,7 +4,7 @@ import os from "os";
 import path from "path";
 import { NpmList, PackageJson, PackageVersionsAndUrls } from "./types";
 
-const getUpdatedVersion = (newVersion: string, currentVersion: string) => {
+const getUpdatedVersion = (currentVersion: string, newVersion: string) => {
   if (currentVersion.includes("+")) {
     return currentVersion;
   }
@@ -32,16 +32,16 @@ const syncIntoPackageJson = (
       name in packageJsonObject.dependencies
     ) {
       packageJsonObject.dependencies[name] = getUpdatedVersion(
-        version,
-        packageJsonObject.dependencies[name]
+        packageJsonObject.dependencies[name],
+        version
       );
     } else if (
       packageJsonObject.devDependencies &&
       name in packageJsonObject.devDependencies
     ) {
       packageJsonObject.devDependencies[name] = getUpdatedVersion(
-        version,
-        packageJsonObject.devDependencies[name]
+        packageJsonObject.devDependencies[name],
+        version
       );
     }
   });
