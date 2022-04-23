@@ -48,16 +48,16 @@ const syncIntoPackageJson = (
   return packageJsonObject;
 };
 
-function getEolCharacter(source: string) {
+const getEolCharacter = (source: string) => {
   const match = source.match(/\r?\n/);
   return match === null ? os.EOL : match[0];
-}
+};
 
 // Only the root package.json file contains a workspaces field but to simplify the code we don't separate the logic.
-function updatePackageJson(
+const updatePackageJson = (
   packageJsonPath: string,
   rootDeps: PackageVersionsAndUrls
-) {
+) => {
   if (!fs.statSync(packageJsonPath)) {
     return;
   }
@@ -108,7 +108,7 @@ function updatePackageJson(
   //     }
   //   }
   // }
-}
+};
 
 const packageJsonPath = path.resolve(process.cwd(), "package.json");
 const installedPackages = (
