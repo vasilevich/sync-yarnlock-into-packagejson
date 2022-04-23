@@ -14,11 +14,7 @@
     "type": "git",
     "url": "git+https://github.com/janaagaard75/syncpackagejson"
   },
-  "dependencies": {
-    "glob": "^7.1.4"
-  },
   "devDependencies": {
-    "@types/glob": "^7.1.1",
     "@types/node": "12.6.3",
     "prettier": "^2.6.2",
     "rimraf": "^2.6.3",
