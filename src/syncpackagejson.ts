@@ -58,11 +58,6 @@ const getUpdatedVersion = (newVersion: string, currentVersion: string) => {
   return newVersion;
 };
 
-interface IDependency {
-  name: string;
-  version: string;
-}
-
 const syncIntoPackageJson = (
   packageJsonObject: PackageJson,
   installedPackages: PackageVersionsAndUrls
