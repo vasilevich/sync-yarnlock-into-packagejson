@@ -5,7 +5,6 @@
     "module": "System",
     "moduleResolution": "node",
     "outFile": "lib/syncpackagejson.js",
-    "noImplicitAny": false,
     "strict": true,
     "target": "es2020"
   }

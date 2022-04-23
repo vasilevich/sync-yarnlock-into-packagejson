@@ -1,10 +1,9 @@
 import childProcess from "child_process";
+import program from "commander";
 import { promises as fs } from "fs";
-import glob from "glob";
 import os from "os";
 import path from "path";
-
-import program = require("commander");
+import { NpmList, PackageJson, PackageVersionsAndUrls } from "./types";
 
 program
   .version(require("../package.json").version)
@@ -39,15 +38,18 @@ program
   )
   .parse(process.argv);
 
-const processVersion = (newVersion, currentVersion) => {
+const processVersion = (newVersion: string, currentVersion: string) => {
   if (program.keepGit && currentVersion.includes("+")) return currentVersion;
   if (program.keepLink && currentVersion.includes("link:"))
     return currentVersion;
   if (
     program.keepVariable &&
-    program.keepVariable.split(",").find((f) => currentVersion.includes(f))
-  )
+    (program.keepVariable as string)
+      .split(",")
+      .find((f) => currentVersion.includes(f))
+  ) {
     return currentVersion;
+  }
   if (program.keepPrefix) {
     const match = currentVersion.match(/(^[\^><=~]+)/);
     const range = match ? match[0] : "";
@@ -61,11 +63,14 @@ interface IDependency {
   version: string;
 }
 
-const syncDepsIntoPackageJson = (packageJsonObject, deps) => {
-  deps.forEach((dependency) => {
-    const sep = dependency.name.lastIndexOf("@");
-    const name = dependency.name.slice(0, sep);
-    const version = dependency.name.slice(sep + 1);
+const syncDepsIntoPackageJson = (
+  packageJsonObject: PackageJson,
+  deps: PackageVersionsAndUrls
+) => {
+  const dependencyNames = Object.keys(deps);
+  dependencyNames.forEach((dependencyName) => {
+    const name = dependencyName;
+    const version = deps[dependencyName].version;
 
     if (
       packageJsonObject.dependencies &&
@@ -94,25 +99,22 @@ function getLineFeed(source: string) {
 }
 
 // Only the root package.json file contains a workspaces field but to simplify the code we don't separate the logic.
-async function updatePackage(jsonPath: string, rootDeps) {
+async function updatePackage(
+  jsonPath: string,
+  rootDeps: PackageVersionsAndUrls
+) {
   if (!(await fs.stat(jsonPath))) {
     return;
   }
 
   const packageJsonText = await fs.readFile(jsonPath, "utf8");
-  const packageJson = JSON.parse(packageJsonText);
+  const packageJson = JSON.parse(packageJsonText) as PackageJson;
   const saveTo = path.resolve(
     path.dirname(jsonPath),
     program.save ? "package.json" : "package.json.yarn"
   );
 
-  const workspacePackageDeps =
-    (rootDeps.find((dep) => dep.name.startsWith(`${packageJson.name}@`)) || {})
-      .children || [];
-  const syncedDeps = syncDepsIntoPackageJson(
-    packageJson,
-    rootDeps.concat(workspacePackageDeps)
-  );
+  const syncedDeps = syncDepsIntoPackageJson(packageJson, rootDeps);
   const newPackageJsonText = (
     JSON.stringify(syncedDeps, null, 2) + "\n"
   ).replace(/\r?\n/g, getLineFeed(packageJsonText));
@@ -126,28 +128,29 @@ async function updatePackage(jsonPath: string, rootDeps) {
     console.log("No changes to %s", saveTo);
   }
 
-  if (packageJson.workspaces) {
-    const packagePaths =
-      packageJson.workspaces.packages || packageJson.workspaces;
-    if (Array.isArray(packagePaths)) {
-      for (const packagePath of packagePaths) {
-        const packages = glob.sync(
-          `${packagePath}${packagePath.endsWith("/") ? "" : "/"}`,
-          { absolute: true }
-        );
-        for (const workspaceDir of packages) {
-          const workspacePackageJson = path.join(workspaceDir, "package.json");
-          await updatePackage(workspacePackageJson, rootDeps);
-        }
-      }
-    }
-  }
+  // if (originalPackageJson.workspaces) {
+  //   const packagePaths =
+  //     originalPackageJson.workspaces.packages || originalPackageJson.workspaces;
+  //   if (Array.isArray(packagePaths)) {
+  //     for (const packagePath of packagePaths) {
+  //       const packages = glob.sync(
+  //         `${packagePath}${packagePath.endsWith("/") ? "" : "/"}`,
+  //         { absolute: true }
+  //       );
+  //       for (const workspaceDir of packages) {
+  //         const workspacePackageJson = path.join(workspaceDir, "package.json");
+  //         await updatePackageJson(workspacePackageJson, installedPackages);
+  //       }
+  //     }
+  //   }
+  // }
 }
 
 const dir = program.dir ? program.dir : process.cwd();
 const packageDir = program.dirPackageJson ? program.dirPackageJson : dir;
 
-const depsTree = JSON.parse(childProcess.execSync("npm list --json").toString())
-  .data.dependencies;
+const depsTree = (
+  JSON.parse(childProcess.execSync("npm list --json").toString()) as NpmList
+).dependencies;
 
 updatePackage(path.resolve(packageDir, "package.json"), depsTree);
