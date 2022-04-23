@@ -38,7 +38,7 @@ program
   )
   .parse(process.argv);
 
-const processVersion = (newVersion: string, currentVersion: string) => {
+const getUpdatedVersion = (newVersion: string, currentVersion: string) => {
   if (program.keepGit && currentVersion.includes("+")) return currentVersion;
   if (program.keepLink && currentVersion.includes("link:"))
     return currentVersion;
@@ -63,20 +63,20 @@ interface IDependency {
   version: string;
 }
 
-const syncDepsIntoPackageJson = (
+const syncIntoPackageJson = (
   packageJsonObject: PackageJson,
-  deps: PackageVersionsAndUrls
+  installedPackages: PackageVersionsAndUrls
 ) => {
-  const dependencyNames = Object.keys(deps);
+  const dependencyNames = Object.keys(installedPackages);
   dependencyNames.forEach((dependencyName) => {
     const name = dependencyName;
-    const version = deps[dependencyName].version;
+    const version = installedPackages[dependencyName].version;
 
     if (
       packageJsonObject.dependencies &&
       name in packageJsonObject.dependencies
     ) {
-      packageJsonObject.dependencies[name] = processVersion(
+      packageJsonObject.dependencies[name] = getUpdatedVersion(
         version,
         packageJsonObject.dependencies[name]
       );
@@ -84,7 +84,7 @@ const syncDepsIntoPackageJson = (
       packageJsonObject.devDependencies &&
       name in packageJsonObject.devDependencies
     ) {
-      packageJsonObject.devDependencies[name] = processVersion(
+      packageJsonObject.devDependencies[name] = getUpdatedVersion(
         version,
         packageJsonObject.devDependencies[name]
       );
@@ -93,13 +93,13 @@ const syncDepsIntoPackageJson = (
   return packageJsonObject;
 };
 
-function getLineFeed(source: string) {
+function getEolCharacter(source: string) {
   const match = source.match(/\r?\n/);
   return match === null ? os.EOL : match[0];
 }
 
 // Only the root package.json file contains a workspaces field but to simplify the code we don't separate the logic.
-async function updatePackage(
+async function updatePackageJson(
   jsonPath: string,
   rootDeps: PackageVersionsAndUrls
 ) {
@@ -108,16 +108,16 @@ async function updatePackage(
   }
 
   const packageJsonText = await fs.readFile(jsonPath, "utf8");
-  const packageJson = JSON.parse(packageJsonText) as PackageJson;
+  const originalPackageJson = JSON.parse(packageJsonText) as PackageJson;
   const saveTo = path.resolve(
     path.dirname(jsonPath),
     program.save ? "package.json" : "package.json.yarn"
   );
 
-  const syncedDeps = syncDepsIntoPackageJson(packageJson, rootDeps);
+  const updatedPackageJson = syncIntoPackageJson(originalPackageJson, rootDeps);
   const newPackageJsonText = (
-    JSON.stringify(syncedDeps, null, 2) + "\n"
-  ).replace(/\r?\n/g, getLineFeed(packageJsonText));
+    JSON.stringify(updatedPackageJson, null, 2) + "\n"
+  ).replace(/\r?\n/g, getEolCharacter(packageJsonText));
   if (!program.save || packageJsonText !== newPackageJsonText) {
     try {
       await fs.writeFile(saveTo, newPackageJsonText);
@@ -149,8 +149,8 @@ async function updatePackage(
 const dir = program.dir ? program.dir : process.cwd();
 const packageDir = program.dirPackageJson ? program.dirPackageJson : dir;
 
-const depsTree = (
+const installedPackages = (
   JSON.parse(childProcess.execSync("npm list --json").toString()) as NpmList
 ).dependencies;
 
-updatePackage(path.resolve(packageDir, "package.json"), depsTree);
+updatePackageJson(path.resolve(packageDir, "package.json"), installedPackages);
