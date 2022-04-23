@@ -30,9 +30,11 @@ const synchronizeInstalledVersionsIntoPackageJson = (
   const packageJson = JSON.parse(originalPackageJsonText) as PackageJson;
 
   updatePackageJsonObject(packageJson, rootDeps);
-  const updatedPackageJsonText = (
-    JSON.stringify(packageJson, null, 2) + "\n"
-  ).replace(/\r?\n/g, getEolCharacter(originalPackageJsonText));
+  const packageJsonEolCharacters = getEolCharacter(originalPackageJsonText);
+  const updatedPackageJsonText = getPackageJsonText(
+    packageJson,
+    packageJsonEolCharacters
+  );
 
   if (updatedPackageJsonText === originalPackageJsonText) {
     console.info(
@@ -127,9 +129,18 @@ const getRange = (versionWithRange: string): string => {
   return rangeMatches[0];
 };
 
-const getEolCharacter = (source: string) => {
-  const match = source.match(/\r?\n/);
+const getEolCharacter = (packageJsonText: string) => {
+  const match = packageJsonText.match(/\r?\n/);
   return match === null ? os.EOL : match[0];
+};
+
+const getPackageJsonText = (
+  packageJson: PackageJson,
+  eolCharacters: string
+) => {
+  const packageJsonText = JSON.stringify(packageJson, null, 2) + "\n";
+  const withCorrectEols = packageJsonText.replace(/\r?\n/g, eolCharacters);
+  return withCorrectEols;
 };
 
 main();
