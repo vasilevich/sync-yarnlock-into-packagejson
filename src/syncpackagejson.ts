@@ -4,18 +4,30 @@ import os from "os";
 import path from "path";
 import { NpmList, PackageJson, PackageVersionsAndUrls } from "./types";
 
-const getUpdatedVersion = (currentVersion: string, newVersion: string) => {
-  if (currentVersion.includes("+")) {
-    return currentVersion;
+const getUpdatedVersionWithRange = (
+  originalVersionWithRange: string,
+  installedVersionWithoutRange: string
+) => {
+  if (originalVersionWithRange.includes("+")) {
+    return originalVersionWithRange;
   }
 
-  if (currentVersion.includes("link:")) {
-    return currentVersion;
+  if (originalVersionWithRange.includes("link:")) {
+    return originalVersionWithRange;
   }
 
-  const rangeMatches = currentVersion.match(/(^[\^><=~]+)/);
-  const range = rangeMatches !== null ? rangeMatches[0] : "";
-  return range + newVersion;
+  const range = getRange(originalVersionWithRange);
+  return range + installedVersionWithoutRange;
+};
+
+const getRange = (versionWithRange: string): string => {
+  // Match any combination of ^, <, >, = and ~ characters at the beginning of the string.
+  const rangeMatches = versionWithRange.match(/(^[\^><=~]+)/);
+  if (rangeMatches === null) {
+    return "";
+  }
+
+  return rangeMatches[0];
 };
 
 const syncIntoPackageJson = (
@@ -31,7 +43,7 @@ const syncIntoPackageJson = (
       packageJsonObject.dependencies &&
       name in packageJsonObject.dependencies
     ) {
-      packageJsonObject.dependencies[name] = getUpdatedVersion(
+      packageJsonObject.dependencies[name] = getUpdatedVersionWithRange(
         packageJsonObject.dependencies[name],
         version
       );
@@ -39,7 +51,7 @@ const syncIntoPackageJson = (
       packageJsonObject.devDependencies &&
       name in packageJsonObject.devDependencies
     ) {
-      packageJsonObject.devDependencies[name] = getUpdatedVersion(
+      packageJsonObject.devDependencies[name] = getUpdatedVersionWithRange(
         packageJsonObject.devDependencies[name],
         version
       );

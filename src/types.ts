@@ -1,6 +1,7 @@
 export interface NpmList {
   dependencies: PackageVersionsAndUrls;
   name: string;
+  /** Version without range. */
   version: string;
 }
 
@@ -13,6 +14,7 @@ export interface PackageJson {
 }
 
 export interface PackageVersions {
+  /** Version with range. */
   [packageName: string]: string;
 }
 
@@ -22,5 +24,6 @@ export interface PackageVersionsAndUrls {
 
 export interface VersionAndUrl {
   resolved: string;
+  /** Version without range. */
   version: string;
 }
