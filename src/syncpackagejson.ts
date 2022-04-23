@@ -16,31 +16,7 @@ const synchronizeInstalledVersionsIntoPackageJson = () => {
   const packageJsonObject = JSON.parse(originalPackageJsonText) as PackageJson;
 
   updatePackageJsonObject(packageJsonObject, installedPackages);
-  const packageJsonEolCharacters = getEolCharacter(originalPackageJsonText);
-  const updatedPackageJsonText = getPackageJsonText(
-    packageJsonObject,
-    packageJsonEolCharacters
-  );
-
-  if (updatedPackageJsonText === originalPackageJsonText) {
-    console.info(
-      "All package versions in %s already match the installed ones.",
-      packageJsonPath
-    );
-    return;
-  }
-
-  try {
-    fs.writeFileSync(packageJsonPath, updatedPackageJsonText);
-  } catch (error) {
-    console.error("Error saving %s.", packageJsonPath, error);
-    return;
-  }
-
-  console.info(
-    "Updated package versions in %s to match the installed ones.",
-    packageJsonPath
-  );
+  writePackageJson(originalPackageJsonText, packageJsonObject, packageJsonPath);
 
   // if (originalPackageJson.workspaces) {
   //   const packagePaths =
@@ -119,6 +95,38 @@ const getRangePrefix = (versionWithRange: string): string => {
   }
 
   return rangeMatches[0];
+};
+
+const writePackageJson = (
+  originalPackageJsonText: string,
+  packageJsonObject: PackageJson,
+  packageJsonPath: string
+) => {
+  const packageJsonEolCharacters = getEolCharacter(originalPackageJsonText);
+  const updatedPackageJsonText = getPackageJsonText(
+    packageJsonObject,
+    packageJsonEolCharacters
+  );
+
+  if (updatedPackageJsonText === originalPackageJsonText) {
+    console.info(
+      "All package versions in %s already match the installed ones.",
+      packageJsonPath
+    );
+    return;
+  }
+
+  try {
+    fs.writeFileSync(packageJsonPath, updatedPackageJsonText);
+  } catch (error) {
+    console.error("Error saving %s.", packageJsonPath, error);
+    return;
+  }
+
+  console.info(
+    "Updated package versions in %s to match the installed ones.",
+    packageJsonPath
+  );
 };
 
 const getEolCharacter = (packageJsonText: string) => {
