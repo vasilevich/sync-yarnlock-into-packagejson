@@ -57,7 +57,6 @@ const syncIntoPackageJson = (
       );
     }
   });
-  return packageJsonObject;
 };
 
 const getEolCharacter = (source: string) => {
@@ -75,13 +74,11 @@ const updatePackageJson = (
   }
 
   const originalPackageJsonText = fs.readFileSync(packageJsonPath, "utf8");
-  const originalPackageJson = JSON.parse(
-    originalPackageJsonText
-  ) as PackageJson;
+  const packageJson = JSON.parse(originalPackageJsonText) as PackageJson;
 
-  const updatedPackageJson = syncIntoPackageJson(originalPackageJson, rootDeps);
+  syncIntoPackageJson(packageJson, rootDeps);
   const updatedPackageJsonText = (
-    JSON.stringify(updatedPackageJson, null, 2) + "\n"
+    JSON.stringify(packageJson, null, 2) + "\n"
   ).replace(/\r?\n/g, getEolCharacter(originalPackageJsonText));
 
   if (updatedPackageJsonText === originalPackageJsonText) {
