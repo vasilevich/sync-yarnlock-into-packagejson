@@ -36,7 +36,7 @@ const synchronizeInstalledVersionsIntoPackageJson = (
 
   if (updatedPackageJsonText === originalPackageJsonText) {
     console.info(
-      "All package versions in %s match the installed ones.",
+      "All package versions in %s already match the installed ones.",
       packageJsonPath
     );
     return;
@@ -50,7 +50,7 @@ const synchronizeInstalledVersionsIntoPackageJson = (
   }
 
   console.info(
-    "Updated package version in %s to match the installed ones.",
+    "Updated package versions in %s to match the installed ones.",
     packageJsonPath
   );
 
