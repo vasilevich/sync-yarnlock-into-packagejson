@@ -1,6 +1,6 @@
 {
   "name": "syncpackagejson",
-  "version": "1.0.19",
+  "version": "0.0.0",
   "description": "Sync installed versions of npm packages into package.json.",
   "author": "Jan Aagaard <jan@aagaard.net>",
   "license": "MIT",
