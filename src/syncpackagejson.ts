@@ -27,12 +27,12 @@ const synchronizeInstalledVersionsIntoPackageJson = (
   }
 
   const originalPackageJsonText = fs.readFileSync(packageJsonPath, "utf8");
-  const packageJson = JSON.parse(originalPackageJsonText) as PackageJson;
+  const packageJsonObject = JSON.parse(originalPackageJsonText) as PackageJson;
 
-  updatePackageJsonObject(packageJson, rootDeps);
+  updatePackageJsonObject(packageJsonObject, rootDeps);
   const packageJsonEolCharacters = getEolCharacter(originalPackageJsonText);
   const updatedPackageJsonText = getPackageJsonText(
-    packageJson,
+    packageJsonObject,
     packageJsonEolCharacters
   );
 
@@ -75,7 +75,7 @@ const synchronizeInstalledVersionsIntoPackageJson = (
 };
 
 const updatePackageJsonObject = (
-  packageJson: PackageJson,
+  packageJsonObject: PackageJson,
   installedPackages: PackageVersionsAndUrls
 ) => {
   const dependencyNames = Object.keys(installedPackages);
@@ -84,21 +84,23 @@ const updatePackageJsonObject = (
       installedPackages[dependencyName].version;
 
     if (
-      packageJson.dependencies &&
-      dependencyName in packageJson.dependencies
+      packageJsonObject.dependencies &&
+      dependencyName in packageJsonObject.dependencies
     ) {
-      packageJson.dependencies[dependencyName] = getUpdatedVersionWithRange(
-        packageJson.dependencies[dependencyName],
-        installedVersionWithoutRange
-      );
+      packageJsonObject.dependencies[dependencyName] =
+        getUpdatedVersionWithRange(
+          packageJsonObject.dependencies[dependencyName],
+          installedVersionWithoutRange
+        );
     } else if (
-      packageJson.devDependencies &&
-      dependencyName in packageJson.devDependencies
+      packageJsonObject.devDependencies &&
+      dependencyName in packageJsonObject.devDependencies
     ) {
-      packageJson.devDependencies[dependencyName] = getUpdatedVersionWithRange(
-        packageJson.devDependencies[dependencyName],
-        installedVersionWithoutRange
-      );
+      packageJsonObject.devDependencies[dependencyName] =
+        getUpdatedVersionWithRange(
+          packageJsonObject.devDependencies[dependencyName],
+          installedVersionWithoutRange
+        );
     }
   });
 };
@@ -115,12 +117,12 @@ const getUpdatedVersionWithRange = (
     return originalVersionWithRange;
   }
 
-  const range = getRange(originalVersionWithRange);
+  const range = getRangePrefix(originalVersionWithRange);
   return range + installedVersionWithoutRange;
 };
 
-const getRange = (versionWithRange: string): string => {
-  // Match any combination of ^, <, >, = and ~ characters at the beginning of the string.
+const getRangePrefix = (versionWithRange: string): string => {
+  // Match any combination of ^, >, <, = and ~ characters at the beginning of the string.
   const rangeMatches = versionWithRange.match(/(^[\^><=~]+)/);
   if (rangeMatches === null) {
     return "";
@@ -131,14 +133,19 @@ const getRange = (versionWithRange: string): string => {
 
 const getEolCharacter = (packageJsonText: string) => {
   const match = packageJsonText.match(/\r?\n/);
-  return match === null ? os.EOL : match[0];
+  if (match === null) {
+    return os.EOL;
+  }
+
+  return match[0];
 };
 
 const getPackageJsonText = (
-  packageJson: PackageJson,
+  packageJsonObject: PackageJson,
   eolCharacters: string
 ) => {
-  const packageJsonText = JSON.stringify(packageJson, null, 2) + "\n";
+  const packageJsonText =
+    JSON.stringify(packageJsonObject, undefined, 2) + "\n";
   const withCorrectEols = packageJsonText.replace(/\r?\n/g, eolCharacters);
   return withCorrectEols;
 };
