@@ -21,7 +21,7 @@ const main = () => {
 };
 
 // Only the root package.json file contains a workspaces field but to simplify the code we don't separate the logic.
-const synchronizeInstalledVersionsIntoPackageJson = (
+export const synchronizeInstalledVersionsIntoPackageJson = (
   inputPackageJsonPath: string,
   packageLockJsonPath: string,
   outputPackageJsonPath: string

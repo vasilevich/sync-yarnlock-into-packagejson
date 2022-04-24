@@ -1,0 +1,20 @@
+{
+  "name": "syncpackagejson",
+  "version": "0.0.0",
+  "description": "Sync installed versions listed in package-lock.json into package.json.",
+  "author": "Jan Aagaard <jan@janaagaard.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "ts-node syncpackagejson.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/janaagaard75/syncpackagejson.git"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.0",
+    "prettier": "^2.5.0",
+    "ts-node": "^10.4.1"
+  }
+}
