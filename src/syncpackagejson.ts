@@ -9,19 +9,35 @@ import {
   PackageVersionsAndUrls,
 } from "./types";
 
+const main = () => {
+  const inputPackageJsonPath = path.resolve(process.cwd(), "package.json");
+  const outputPackageJsonPath = path.resolve(process.cwd(), "package.json");
+
+  synchronizeInstalledVersionsIntoPackageJson(
+    inputPackageJsonPath,
+    outputPackageJsonPath
+  );
+};
+
 // Only the root package.json file contains a workspaces field but to simplify the code we don't separate the logic.
-const synchronizeInstalledVersionsIntoPackageJson = () => {
-  const packageJsonPath = path.resolve(process.cwd(), "package.json");
-  if (!fs.statSync(packageJsonPath)) {
+const synchronizeInstalledVersionsIntoPackageJson = (
+  inputPackageJsonPath: string,
+  outputPackageJsonPath: string
+) => {
+  if (!fs.statSync(inputPackageJsonPath)) {
     return;
   }
 
   const installedPackages = getNpmListOutput().dependencies;
-  const originalPackageJsonText = fs.readFileSync(packageJsonPath, "utf8");
+  const originalPackageJsonText = fs.readFileSync(inputPackageJsonPath, "utf8");
   const packageJsonObject = JSON.parse(originalPackageJsonText) as PackageJson;
 
   updatePackageJsonObject(packageJsonObject, installedPackages);
-  writePackageJson(originalPackageJsonText, packageJsonObject, packageJsonPath);
+  writePackageJson(
+    originalPackageJsonText,
+    packageJsonObject,
+    outputPackageJsonPath
+  );
 
   // if (originalPackageJson.workspaces) {
   //   const packagePaths =
@@ -110,7 +126,7 @@ const getRangePrefix = (versionWithRange: string): string => {
 const writePackageJson = (
   originalPackageJsonText: string,
   packageJsonObject: PackageJson,
-  packageJsonPath: string
+  outputPackageJsonPath: string
 ) => {
   const packageJsonEolCharacters = getEolCharacter(originalPackageJsonText);
   const updatedPackageJsonText = getPackageJsonText(
@@ -121,21 +137,21 @@ const writePackageJson = (
   if (updatedPackageJsonText === originalPackageJsonText) {
     console.info(
       "All package versions in %s already match the installed ones.",
-      packageJsonPath
+      outputPackageJsonPath
     );
     return;
   }
 
   try {
-    fs.writeFileSync(packageJsonPath, updatedPackageJsonText);
+    fs.writeFileSync(outputPackageJsonPath, updatedPackageJsonText);
   } catch (error) {
-    console.error("Error saving %s.", packageJsonPath, error);
+    console.error("Error saving %s.", outputPackageJsonPath, error);
     return;
   }
 
   console.info(
     "Updated package versions in %s to match the installed ones.",
-    packageJsonPath
+    outputPackageJsonPath
   );
 };
 
@@ -158,4 +174,4 @@ const getPackageJsonText = (
   return withCorrectEols;
 };
 
-synchronizeInstalledVersionsIntoPackageJson();
+main();
