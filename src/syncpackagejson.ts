@@ -2,7 +2,12 @@ import childProcess from "child_process";
 import fs from "fs";
 import os from "os";
 import path from "path";
-import { NpmList, PackageJson, PackageVersionsAndUrls } from "./types";
+import {
+  NpmList,
+  PackageJson,
+  PackageVersions,
+  PackageVersionsAndUrls,
+} from "./types";
 
 // Only the root package.json file contains a workspaces field but to simplify the code we don't separate the logic.
 const synchronizeInstalledVersionsIntoPackageJson = () => {
@@ -44,31 +49,36 @@ const updatePackageJsonObject = (
   packageJsonObject: PackageJson,
   installedPackages: PackageVersionsAndUrls
 ) => {
-  const dependencyNames = Object.keys(installedPackages);
-  dependencyNames.forEach((dependencyName) => {
-    const installedVersionWithoutRange =
-      installedPackages[dependencyName].version;
+  if (packageJsonObject.dependencies !== undefined) {
+    updatePackageVersions(packageJsonObject.dependencies, installedPackages);
+  }
 
-    if (
-      packageJsonObject.dependencies &&
-      dependencyName in packageJsonObject.dependencies
-    ) {
-      packageJsonObject.dependencies[dependencyName] =
-        getUpdatedVersionWithRange(
-          packageJsonObject.dependencies[dependencyName],
-          installedVersionWithoutRange
-        );
-    } else if (
-      packageJsonObject.devDependencies &&
-      dependencyName in packageJsonObject.devDependencies
-    ) {
-      packageJsonObject.devDependencies[dependencyName] =
-        getUpdatedVersionWithRange(
-          packageJsonObject.devDependencies[dependencyName],
-          installedVersionWithoutRange
-        );
-    }
-  });
+  if (packageJsonObject.devDependencies !== undefined) {
+    updatePackageVersions(packageJsonObject.devDependencies, installedPackages);
+  }
+
+  if (packageJsonObject.peerDependencies !== undefined) {
+    updatePackageVersions(
+      packageJsonObject.peerDependencies,
+      installedPackages
+    );
+  }
+};
+
+const updatePackageVersions = (
+  packageVersions: PackageVersions,
+  installedPackages: PackageVersionsAndUrls
+) => {
+  const packageNames = Object.keys(packageVersions);
+  for (const packageName of packageNames) {
+    const originalVersionWithRange = packageVersions[packageName];
+    const installedVersionWithoutRange = installedPackages[packageName].version;
+    const updatedVersionWithRange = getUpdatedVersionWithRange(
+      originalVersionWithRange,
+      installedVersionWithoutRange
+    );
+    packageVersions[packageName] = updatedVersionWithRange;
+  }
 };
 
 const getUpdatedVersionWithRange = (
