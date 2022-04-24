@@ -38,23 +38,6 @@ const synchronizeInstalledVersionsIntoPackageJson = (
     packageJsonObject,
     outputPackageJsonPath
   );
-
-  // if (originalPackageJson.workspaces) {
-  //   const packagePaths =
-  //     originalPackageJson.workspaces.packages || originalPackageJson.workspaces;
-  //   if (Array.isArray(packagePaths)) {
-  //     for (const packagePath of packagePaths) {
-  //       const packages = glob.sync(
-  //         `${packagePath}${packagePath.endsWith("/") ? "" : "/"}`,
-  //         { absolute: true }
-  //       );
-  //       for (const workspaceDir of packages) {
-  //         const workspacePackageJson = path.join(workspaceDir, "package.json");
-  //         await updatePackageJson(workspacePackageJson, installedPackages);
-  //       }
-  //     }
-  //   }
-  // }
 };
 
 const getInstalledPackages = (): PackageVersionsAndUrls => {
