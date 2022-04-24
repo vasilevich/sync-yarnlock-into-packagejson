@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { synchronizeInstalledVersionsIntoPackageJson } from "./syncpackagejson";
+import { syncPackageJson } from "./syncpackagejson";
 
 test("Upgrades versions correctly.", () => {
   const initialPackageJsonPath = path.join(
@@ -20,7 +20,7 @@ test("Upgrades versions correctly.", () => {
     "./testData/1/expected-package.json"
   );
 
-  synchronizeInstalledVersionsIntoPackageJson(
+  syncPackageJson(
     initialPackageJsonPath,
     packageLockJsonPath,
     updatedPackageJsonPath

@@ -13,7 +13,7 @@ const main = () => {
   const packageLockJsonPath = path.resolve(process.cwd(), "package-lock.json");
   const outputPackageJsonPath = path.resolve(process.cwd(), "package.json");
 
-  synchronizeInstalledVersionsIntoPackageJson(
+  syncPackageJson(
     inputPackageJsonPath,
     packageLockJsonPath,
     outputPackageJsonPath
@@ -21,7 +21,7 @@ const main = () => {
 };
 
 // Only the root package.json file contains a workspaces field but to simplify the code we don't separate the logic.
-export const synchronizeInstalledVersionsIntoPackageJson = (
+export const syncPackageJson = (
   inputPackageJsonPath: string,
   packageLockJsonPath: string,
   outputPackageJsonPath: string
