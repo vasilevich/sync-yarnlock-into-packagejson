@@ -28,7 +28,7 @@ const synchronizeInstalledVersionsIntoPackageJson = (
     return;
   }
 
-  const installedPackages = getNpmListOutput().dependencies;
+  const installedPackages = getInstalledPackages();
   const originalPackageJsonText = fs.readFileSync(inputPackageJsonPath, "utf8");
   const packageJsonObject = JSON.parse(originalPackageJsonText) as PackageJson;
 
@@ -57,8 +57,11 @@ const synchronizeInstalledVersionsIntoPackageJson = (
   // }
 };
 
-const getNpmListOutput = (): NpmList => {
-  return JSON.parse(childProcess.execSync("npm list --json").toString());
+const getInstalledPackages = (): PackageVersionsAndUrls => {
+  const npmListObject = JSON.parse(
+    childProcess.execSync("npm list --json").toString()
+  ) as NpmList;
+  return npmListObject.dependencies;
 };
 
 const updatePackageJsonObject = (
