@@ -1,5 +1,5 @@
 export interface NpmList {
-  dependencies: PackageVersionsAndUrls;
+  dependencies: PackagesInfo;
   name: string;
   /** Version without range. */
   version: string;
@@ -18,12 +18,15 @@ export interface PackageVersions {
   [packageName: string]: string;
 }
 
-export interface PackageVersionsAndUrls {
-  [packageName: string]: VersionAndUrl;
+export interface PackagesInfo {
+  [packageName: string]: Version;
 }
 
-export interface VersionAndUrl {
-  resolved: string;
+interface Dependencies {
+  [packageName: string]: Version;
+}
+
+interface Version {
   /** Version without range. */
   version: string;
 }

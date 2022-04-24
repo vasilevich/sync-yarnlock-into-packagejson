@@ -2,12 +2,7 @@ import childProcess from "child_process";
 import fs from "fs";
 import os from "os";
 import path from "path";
-import {
-  NpmList,
-  PackageJson,
-  PackageVersions,
-  PackageVersionsAndUrls,
-} from "./types";
+import { NpmList, PackageJson, PackagesInfo, PackageVersions } from "./types";
 
 const main = () => {
   const inputPackageJsonPath = path.resolve(process.cwd(), "package.json");
@@ -40,7 +35,7 @@ const synchronizeInstalledVersionsIntoPackageJson = (
   );
 };
 
-const getInstalledPackages = (): PackageVersionsAndUrls => {
+const getInstalledPackages = (): PackagesInfo => {
   const npmListObject = JSON.parse(
     childProcess.execSync("npm list --json").toString()
   ) as NpmList;
@@ -49,7 +44,7 @@ const getInstalledPackages = (): PackageVersionsAndUrls => {
 
 const updatePackageJsonObject = (
   packageJsonObject: PackageJson,
-  installedPackages: PackageVersionsAndUrls
+  installedPackages: PackagesInfo
 ) => {
   if (packageJsonObject.dependencies !== undefined) {
     updatePackageVersions(packageJsonObject.dependencies, installedPackages);
@@ -69,7 +64,7 @@ const updatePackageJsonObject = (
 
 const updatePackageVersions = (
   packageVersions: PackageVersions,
-  installedPackages: PackageVersionsAndUrls
+  installedPackages: PackagesInfo
 ) => {
   const packageNames = Object.keys(packageVersions);
   for (const packageName of packageNames) {
