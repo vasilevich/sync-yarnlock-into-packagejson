@@ -1,24 +1,11 @@
 import fs from "fs";
 import os from "os";
-import path from "path";
 import {
   PackageJson,
   PackageLockJson,
   PackagesInfo,
   PackageVersions,
 } from "./types";
-
-const main = () => {
-  const inputPackageJsonPath = path.resolve(process.cwd(), "package.json");
-  const packageLockJsonPath = path.resolve(process.cwd(), "package-lock.json");
-  const outputPackageJsonPath = path.resolve(process.cwd(), "package.json");
-
-  syncPackageJson(
-    inputPackageJsonPath,
-    packageLockJsonPath,
-    outputPackageJsonPath
-  );
-};
 
 // Only the root package.json file contains a workspaces field but to simplify the code we don't separate the logic.
 export const syncPackageJson = (
@@ -163,5 +150,3 @@ const getPackageJsonText = (
   const withCorrectEols = packageJsonText.replace(/\r?\n/g, eolCharacters);
   return withCorrectEols;
 };
-
-main();
