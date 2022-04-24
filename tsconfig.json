@@ -4,7 +4,7 @@
     "esModuleInterop": true,
     "module": "System",
     "moduleResolution": "node",
-    "outFile": "lib/syncpackagejson.js",
+    "outFile": "lib/main.js",
     "strict": true,
     "target": "es2020"
   }

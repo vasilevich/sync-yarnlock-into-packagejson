@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-require("../lib/syncpackagejson.js");
+require("../lib/main.js");
