@@ -1,15 +1,21 @@
-import childProcess from "child_process";
 import fs from "fs";
 import os from "os";
 import path from "path";
-import { NpmList, PackageJson, PackagesInfo, PackageVersions } from "./types";
+import {
+  PackageJson,
+  PackageLockJson,
+  PackagesInfo,
+  PackageVersions,
+} from "./types";
 
 const main = () => {
   const inputPackageJsonPath = path.resolve(process.cwd(), "package.json");
+  const packageLockJsonPath = path.resolve(process.cwd(), "package-lock.json");
   const outputPackageJsonPath = path.resolve(process.cwd(), "package.json");
 
   synchronizeInstalledVersionsIntoPackageJson(
     inputPackageJsonPath,
+    packageLockJsonPath,
     outputPackageJsonPath
   );
 };
@@ -17,13 +23,14 @@ const main = () => {
 // Only the root package.json file contains a workspaces field but to simplify the code we don't separate the logic.
 const synchronizeInstalledVersionsIntoPackageJson = (
   inputPackageJsonPath: string,
+  packageLockJsonPath: string,
   outputPackageJsonPath: string
 ) => {
   if (!fs.statSync(inputPackageJsonPath)) {
     return;
   }
 
-  const installedPackages = getInstalledPackages();
+  const installedPackages = getInstalledPackages(packageLockJsonPath);
   const originalPackageJsonText = fs.readFileSync(inputPackageJsonPath, "utf8");
   const packageJsonObject = JSON.parse(originalPackageJsonText) as PackageJson;
 
@@ -35,11 +42,13 @@ const synchronizeInstalledVersionsIntoPackageJson = (
   );
 };
 
-const getInstalledPackages = (): PackagesInfo => {
-  const npmListObject = JSON.parse(
-    childProcess.execSync("npm list --json").toString()
-  ) as NpmList;
-  return npmListObject.dependencies;
+const getInstalledPackages = (packageLockJsonPath: string): PackagesInfo => {
+  const packageLockJsonText = fs.readFileSync(packageLockJsonPath, "utf8");
+  const packageLockJsonObject = JSON.parse(
+    packageLockJsonText
+  ) as PackageLockJson;
+
+  return packageLockJsonObject.dependencies;
 };
 
 const updatePackageJsonObject = (

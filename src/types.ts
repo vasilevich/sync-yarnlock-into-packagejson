@@ -13,16 +13,17 @@ export interface PackageJson {
   workspaces?: any;
 }
 
+export interface PackageLockJson {
+  lockfileVersion: number;
+  dependencies: PackagesInfo;
+}
+
 export interface PackageVersions {
   /** Version with range. */
   [packageName: string]: string;
 }
 
 export interface PackagesInfo {
-  [packageName: string]: Version;
-}
-
-interface Dependencies {
   [packageName: string]: Version;
 }
 
