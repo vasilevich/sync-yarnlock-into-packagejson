@@ -7,7 +7,6 @@ import {
   PackageVersions,
 } from "./types";
 
-// Only the root package.json file contains a workspaces field but to simplify the code we don't separate the logic.
 export const syncPackageJson = (
   inputPackageJsonPath: string,
   packageLockJsonPath: string,
