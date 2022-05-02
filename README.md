@@ -12,9 +12,9 @@ Sync installed versions of npm packages into package.json.
 
 ## To Do
 
-- Add more tests.
 - Release version 0.1.
-- Use a more object oriented approach.
+- Add more tests.
+- Try using a object oriented approach to structure the code.
 - Add command line args using [yargs](https://github.com/yargs/yargs) or something similar.
 - Explain how this little program works here in the readme.
 - Add support for workspaces. See code snippet below.
