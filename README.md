@@ -1,6 +1,6 @@
 # syncpackagejson
 
-Sync installed versions of npm packages into package.json.
+Synchronize installed versions of npm packages as specified in package-lock.json into package.json.
 
 ## Usage
 
