@@ -105,7 +105,7 @@ const writePackageJson = (
   packageJsonObject: PackageJson,
   outputPackageJsonPath: string
 ) => {
-  const packageJsonEolCharacters = getEolCharacter(originalPackageJsonText);
+  const packageJsonEolCharacters = getEolCharacters(originalPackageJsonText);
   const updatedPackageJsonText = getPackageJsonText(
     packageJsonObject,
     packageJsonEolCharacters
@@ -132,7 +132,7 @@ const writePackageJson = (
   );
 };
 
-const getEolCharacter = (packageJsonText: string) => {
+const getEolCharacters = (packageJsonText: string) => {
   const match = packageJsonText.match(/\r?\n/);
   if (match === null) {
     return os.EOL;
