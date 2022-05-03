@@ -2,9 +2,9 @@
   "env": "node",
   "compilerOptions": {
     "esModuleInterop": true,
-    "module": "System",
+    "module": "commonjs",
     "moduleResolution": "node",
-    "outFile": "lib/main.js",
+    "outDir": "lib",
     "strict": true,
     "target": "es2020"
   }
