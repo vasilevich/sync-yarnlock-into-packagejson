@@ -7,6 +7,10 @@
   "bin": {
     "syncpackagejson": "./bin/syncpackagejson.js"
   },
+  "files": [
+    "bin",
+    "lib"
+  ],
   "scripts": {
     "build": "rimraf lib/ && tsc",
     "prepublish": "npm test && npm run build",
