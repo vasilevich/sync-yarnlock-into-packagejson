@@ -12,8 +12,7 @@
     "lib"
   ],
   "scripts": {
-    "build": "rimraf lib/ && tsc",
-    "prepublish": "npm test && npm run build",
+    "build": "npm install --no-audit --no-fund && npm test && rimraf lib/ && tsc",
     "test": "jest"
   },
   "repository": {
