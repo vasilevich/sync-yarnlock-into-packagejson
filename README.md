@@ -11,7 +11,7 @@ The intended usage is to combine this lille script with `npm upgrade`. You can a
 ```json
 {
   "scripts": {
-    "update-packages": "npm upgrade && npx syncpackagejson"
+    "update-packages": "npm upgrade && npx syncpackagejson && npm install"
   }
 }
 ```
