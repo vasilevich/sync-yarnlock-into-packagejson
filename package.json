@@ -1,6 +1,6 @@
 {
   "name": "syncpackagejson",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Synchronize installed versions of npm packages as specified in package-lock.json into package.json.",
   "author": "Jan Aagaard <jan@aagaard.net>",
   "license": "MIT",
