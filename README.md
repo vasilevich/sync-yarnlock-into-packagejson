@@ -2,21 +2,32 @@
 
 Synchronize installed versions of npm packages as specified in package-lock.json into package.json.
 
+This program works by looking up the installed versions of each packages in package-lock.json, and then updating package.json with the version that is actually installed.
+
 ## Usage
 
-```shell
-Usage: npx syncpackagejson
+The intended usage is to combine this lille script with `npm upgrade`. You can add the following run script to `package.json`...
 
-Sync installed versions of npm packages into package.json.
+```json
+{
+  "scripts": {
+    "update-packages": "npm upgrade && npx syncpackagejson"
+  }
+}
+```
+
+... and then run the following command to update all packages and transitive packages to their latest versions and then synchronize the installed versions into `package.json`.
+
+```shell
+npm run update-packages
 ```
 
 ## To Do
 
-- Release version 0.1.
 - Add more tests.
-- Try using a object oriented approach to structure the code.
+- Make the code more robust.
+- Try restructuring the code using an object oriente approach.
 - Add command line args using [yargs](https://github.com/yargs/yargs) or something similar.
-- Explain how this little program works here in the readme.
 - Add support for workspaces. See code snippet below.
 - More error checking like Yarn being used instead of npm.
 
