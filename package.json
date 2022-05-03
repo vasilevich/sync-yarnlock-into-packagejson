@@ -9,6 +9,7 @@
   },
   "scripts": {
     "build": "rimraf lib/ && tsc",
+    "prepublish": "npm test && npm run build",
     "test": "jest"
   },
   "repository": {
