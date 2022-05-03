@@ -24,6 +24,7 @@ npm run update-packages
 
 ## To Do
 
+- Add a changelog.
 - Add more tests.
 - Make the code more robust.
 - Try restructuring the code using an object oriente approach.
