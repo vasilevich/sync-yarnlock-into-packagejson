@@ -12,7 +12,7 @@
     "lib"
   ],
   "scripts": {
-    "build": "npm install --no-audit --no-fund && npm test && rimraf lib/ && tsc",
+    "build": "npm install --no-audit --no-fund && rimraf lib/ && tsc",
     "test": "jest"
   },
   "repository": {
